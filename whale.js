@@ -1,10 +1,8 @@
 var FOG_ENABLED = true;
 
-var container, stats, keyboard;
+var keyboard;
 
 var camera, scene, renderer;
-
-var text, plane;
 
 var targetRotation = 0;
 var targetRotationOnMouseDown = 0;
@@ -66,23 +64,20 @@ var left_fin_x_correction = 30;
 var fin_default_z_offset = 5;
 var fin_default_rotation = .7;
 
-var WINDOW_WIDTH;
-var WINDOW_HEIGHT;
-var HALF_WINDOW_WIDTH;
-var HALF_WINDOW_HEIGHT;
+var $DISPLAY;
+var WIDTH;
+var HEIGHT;
+var HALF_WIDTH;
+var HALF_HEIGHT;
 
-// Ditch this
-var debugobj;
-
-init();
+init($('#web-whale'));
 animate();
 
-function update_window_dimensions() {
-    // Set the global window width and height variables
-    WINDOW_WIDTH = $(window).width();
-    WINDOW_HEIGHT = $(window).height();
-    HALF_WINDOW_WIDTH = WINDOW_WIDTH / 2;
-    HALF_WINDOW_HEIGHT = WINDOW_HEIGHT / 2;
+function update_display_dimensions() {
+    WIDTH = $DISPLAY.width();
+    HEIGHT = $DISPLAY.height();
+    HALF_WIDTH = WIDTH / 2;
+    HALF_HEIGHT = HEIGHT / 2;
 }
 
 function range_slope(start, end, num) {
@@ -104,14 +99,12 @@ function range_slope(start, end, num) {
 
 
 
-function init() {
+function init($display) {
 
-    container = document.createElement( 'div' );
-    document.body.appendChild( container );
+    $DISPLAY = $display;
+    update_display_dimensions();
 
-    update_window_dimensions();
-
-    camera = new THREE.PerspectiveCamera( 45, WINDOW_WIDTH / WINDOW_HEIGHT, 1, 1400 );
+    camera = new THREE.PerspectiveCamera( 45, WIDTH / HEIGHT, 1, 1400 );
     camera.position.set( 0, 0, 1000);
 
     scene = new THREE.Scene();
@@ -466,10 +459,10 @@ function init() {
     }
 
     renderer = new THREE.WebGLRenderer( { antialias: true } );
-    renderer.setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+    renderer.setSize(WIDTH, HEIGHT);
     renderer.sortObjects = false;
     renderer.sortElements = false;
-    container.appendChild( renderer.domElement );
+    $DISPLAY.append(renderer.domElement);
 
 
     document.addEventListener( 'mousemove', onDocumentMouseMove, false );
@@ -499,8 +492,8 @@ function initBubble(bubble, delay) {
         return num;
     }
 
-    var x_target = maybe_invert(_.random(HALF_WINDOW_WIDTH * .5, HALF_WINDOW_WIDTH));
-    var y_target = maybe_invert(_.random(HALF_WINDOW_HEIGHT * .5, HALF_WINDOW_HEIGHT));
+    var x_target = maybe_invert(_.random(HALF_WIDTH * .5, HALF_WIDTH));
+    var y_target = maybe_invert(_.random(HALF_HEIGHT * .5, HALF_HEIGHT));
     var z_target = -1500;
 
     new TWEEN.Tween( bubble )
@@ -517,10 +510,10 @@ function initBubble(bubble, delay) {
 
 
 function onWindowResize() {
-    update_window_dimensions();
-    camera.aspect = WINDOW_WIDTH / WINDOW_HEIGHT;
+    update_display_dimensions();
+    camera.aspect = WIDTH / HEIGHT;
     camera.updateProjectionMatrix();
-    renderer.setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+    renderer.setSize(WIDTH, HEIGHT);
 }
 
 
@@ -579,8 +572,8 @@ function animateWhalePiece(piece, tox, toy) {
 }
 
 function goToMouseInner( event ) {
-    mouseX = event.clientX - HALF_WINDOW_WIDTH;
-    mouseY = -(event.clientY - HALF_WINDOW_HEIGHT);
+    mouseX = event.clientX - HALF_WIDTH;
+    mouseY = -(event.clientY - HALF_HEIGHT);
     animateWhalePiece(last_piece, mouseX, mouseY);
 }
 
@@ -591,8 +584,8 @@ function onDocumentMouseUp( event ) {
     document.removeEventListener( 'mouseup', onDocumentMouseUp, false );
     document.removeEventListener( 'mouseout', onDocumentMouseOut, false );
 
-    mouseX = event.clientX - HALF_WINDOW_WIDTH;
-    mouseY = -(event.clientY - HALF_WINDOW_HEIGHT);
+    mouseX = event.clientX - HALF_WIDTH;
+    mouseY = -(event.clientY - HALF_HEIGHT);
     animateWhalePiece(last_piece, mouseX, mouseY);
 }
 
@@ -615,7 +608,7 @@ function onSpacePress( event ) {
 
 	// event.preventDefault();
 
-	// mouseXOnMouseDown = event.touches[ 0 ].pageX - HALF_WINDOW_WIDTH;
+	// mouseXOnMouseDown = event.touches[ 0 ].pageX - HALF_WIDTH;
 	// targetRotationOnMouseDown = targetRotation;
 
  //    }
@@ -629,7 +622,7 @@ function onDocumentTouchMove( event ) {
 
 	event.preventDefault();
 
-	mouseX = event.touches[ 0 ].pageX - HALF_WINDOW_WIDTH;
+	mouseX = event.touches[ 0 ].pageX - HALF_WIDTH;
 	targetRotation = targetRotationOnMouseDown + ( mouseX - mouseXOnMouseDown ) * 0.05;
 
     }
